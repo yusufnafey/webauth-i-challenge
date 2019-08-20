@@ -1,11 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const session = require("express-session");
+const KnexSessionStore = require("connect-session-knex")(session);
 
 const UsersModel = require("./users-model");
 
 const server = express();
+const knexConnection = require("./db-config");
 
 server.use(express.json());
+server.use(session(sessionOptions));
 
 server.get("/", (req, res) => {
   res.send("Hello from /");
@@ -32,16 +36,6 @@ server.post("/api/register", (req, res) => {
           .json({ message: "There was an error registering the user." });
       });
   }
-
-  // UsersModel.add(user)
-  //   .then(users => {
-  //     res.status(201).json(users);
-  //   })
-  //   .catch(error => {
-  //     res
-  //       .status(500)
-  //       .json({ message: "There was an error registering the user. " });
-  //   });
 });
 
 server.post("/api/login", (req, res) => {
