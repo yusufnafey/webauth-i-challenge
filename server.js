@@ -8,13 +8,10 @@ const UsersModel = require("./users-model");
 const server = express();
 const knexConnection = require("./db-config");
 
-server.use(express.json());
-server.use(session(sessionOptions));
-
 // =========== SESSION OPTIONS ===========
 const sessionOptions = {
   name: "testsession",
-  secret: process.env.COOKIE_SECRET,
+  secret: process.env.COOKIE_SECRET || "secret",
   cookie: {
     secure: process.env.COOKIE_SECURE || false,
     maxAge: 1000 * 60 * 60,
@@ -28,6 +25,9 @@ const sessionOptions = {
     clearInterval: 1000 * 60 * 60
   })
 };
+
+server.use(express.json());
+server.use(session(sessionOptions));
 
 server.get("/", (req, res) => {
   res.send("Hello from /");
@@ -46,7 +46,6 @@ server.post("/api/register", (req, res) => {
   } else {
     UsersModel.add(user)
       .then(users => {
-        console.log(users);
         res.status(201).json(users);
       })
       .catch(error => {
@@ -93,29 +92,16 @@ server.get("/api/users", restricted, (req, res) => {
 // =========== LOG OUT ===========
 server.get("/logout", (req, res) => {
   req.session.destroy(() => {
-    res.status(200).json({ bye: user.username });
+    res.status(200).json({ bye: "yusuf" });
   });
 });
 
 // =========== RESTRICTED FUNCTION ===========
 function restricted(req, res, next) {
-  let { username, password } = req.headers;
-
-  if (username && password) {
-    UsersModel.findBy({ username })
-      .first()
-      .then(user => {
-        if (user && bcrypt.compareSync(password, user.password)) {
-          next();
-        } else {
-          res.status(401).json({ message: "You shall not pass!" });
-        }
-      })
-      .catch(error => {
-        res.status(500).json(error);
-      });
+  if (req.session && req.session.loggedIn) {
+    next();
   } else {
-    res.status(400).json({ message: "You shall not pass!" });
+    res.status(201).json({ message: "nah bruh." });
   }
 }
 
