@@ -12,6 +12,22 @@ server.get("/", (req, res) => {
 
 server.post("/api/register", (req, res) => {
   const user = req.body;
+
+  if (!user.username || !user.password) {
+    res.status(400).json({
+      message: "Please provide username and password for the new user."
+    });
+  } else {
+    UsersModel.add(user)
+      .then(users => {
+        res.status(201).json(users);
+      })
+      .catch(error => {
+        res
+          .status(500)
+          .json({ message: "There was an error registering the user. " });
+      });
+  }
 });
 
 server.post("/api/login", (req, res) => {});

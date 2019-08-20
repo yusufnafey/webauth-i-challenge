@@ -13,6 +13,8 @@ function find() {
 
 function findBy(filter) {}
 
-function add(user) {}
+function add(user) {
+  return db("users").insert(user);
+}
 
 function findById(id) {}
