@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 
 const UsersModel = require("./users-model");
 
@@ -12,6 +13,8 @@ server.get("/", (req, res) => {
 
 server.post("/api/register", (req, res) => {
   const user = req.body;
+  const hash = bcrypt.hashSync(user.password, 12);
+  user.password = hash;
 
   if (!user.username || !user.password) {
     res.status(400).json({
