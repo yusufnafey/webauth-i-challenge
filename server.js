@@ -23,12 +23,13 @@ server.post("/api/register", (req, res) => {
   } else {
     UsersModel.add(user)
       .then(users => {
+        console.log(users);
         res.status(201).json(users);
       })
       .catch(error => {
         res
           .status(500)
-          .json({ message: "There was an error registering the user. " });
+          .json({ message: "There was an error registering the user." });
       });
   }
 
